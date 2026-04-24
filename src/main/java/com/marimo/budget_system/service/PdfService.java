@@ -30,7 +30,7 @@ public class PdfService {
             NumberFormat currency = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-            // 🟤 LOGO (coloque uma imagem na pasta resources)
+            // LOGO
             try {
                 Image logo = new Image(ImageDataFactory.create("src/main/resources/logo.png"))
                         .scaleToFit(120, 60);
@@ -39,7 +39,7 @@ public class PdfService {
                 // se não tiver logo, segue sem erro
             }
 
-            // 📌 Título
+            // Título
             document.add(new Paragraph("ORÇAMENTO")
                     .setBold()
                     .setFontSize(20)
@@ -47,13 +47,13 @@ public class PdfService {
 
             document.add(new Paragraph("\n"));
 
-            // 👤 Cliente + Data
+            // Cliente + Data
             document.add(new Paragraph("Cliente: " + budget.getCustomer().getName()));
             document.add(new Paragraph("Data: " + budget.getCreatedAt().format(formatter)));
 
             document.add(new Paragraph("\n"));
 
-            // 📊 TABELA
+            // TABELA
             float[] columnWidths = {200F, 80F, 100F, 100F};
             Table table = new Table(columnWidths);
 
@@ -73,10 +73,10 @@ public class PdfService {
 
             document.add(new Paragraph("\n"));
 
-            // 💰 Mão de obra
+            // Mão de obra
             document.add(new Paragraph("Mão de obra: " + currency.format(budget.getLaborCost())));
 
-            // 💵 TOTAL
+            // TOTAL
             document.add(new Paragraph("TOTAL: " + currency.format(budget.getTotalAmount()))
                     .setBold()
                     .setFontSize(14)

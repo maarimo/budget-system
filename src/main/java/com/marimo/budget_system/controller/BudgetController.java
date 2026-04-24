@@ -7,11 +7,10 @@ import com.marimo.budget_system.entity.Customer;
 import com.marimo.budget_system.repository.BudgetRepository;
 import com.marimo.budget_system.repository.CustomerRepository;
 import com.marimo.budget_system.service.BudgetService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.marimo.budget_system.service.PdfService;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,30 +19,49 @@ import java.util.List;
 @RequestMapping("/budgets")
 public class BudgetController {
 
-    @Autowired
-    private BudgetService budgetService;
+    private final PdfService pdfService;
+    private final BudgetService budgetService;
+    private final BudgetRepository budgetRepository;
+    private final CustomerRepository customerRepository;
 
-    @Autowired
-    private BudgetRepository budgetRepository;
+    public BudgetController(
+            PdfService pdfService,
+            BudgetService budgetService,
+            BudgetRepository budgetRepository,
+            CustomerRepository customerRepository
+    ) {
+        this.pdfService = pdfService;
+        this.budgetService = budgetService;
+        this.budgetRepository = budgetRepository;
+        this.customerRepository = customerRepository;
+    }
 
-    @Autowired
-    private CustomerRepository customerRepository;
+    @GetMapping("/{id}/pdf")
+    public ResponseEntity<byte[]> generatePdf(@PathVariable Long id) {
+
+        Budget budget = budgetRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Budget not found"));
+
+        byte[] pdf = pdfService.generateBudgetPdf(budget);
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "inline; filename=budget.pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
+    }
 
     @PostMapping
     public Budget createBudget(@RequestBody BudgetRequestDTO dto) {
 
-        // Buscar cliente
         Customer customer = customerRepository.findById(dto.customerId())
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
 
-        // Criar orçamento
         Budget budget = new Budget();
         budget.setCustomer(customer);
         budget.setLaborCost(dto.laborCost());
         budget.setCreatedAt(LocalDateTime.now());
         budget.setStatus("CREATED");
 
-        // Criar itens
         List<BudgetItem> items = dto.items().stream().map(itemDto -> {
             BudgetItem item = new BudgetItem();
             item.setDescription(itemDto.description());
@@ -55,13 +73,10 @@ public class BudgetController {
             return item;
         }).toList();
 
-        // Associar itens ao orçamento
         budget.setItems(items);
 
-        // Aplicar regras de negócio (cálculo)
         budgetService.updateBudgetValues(budget);
 
-        // Salvar no banco
         return budgetRepository.save(budget);
     }
 }

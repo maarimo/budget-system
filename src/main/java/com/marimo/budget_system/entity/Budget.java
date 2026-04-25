@@ -22,6 +22,7 @@ public class Budget {
     private BigDecimal totalAmount;
     private BigDecimal laborCost;
     private String status;
+    private String serviceDescription;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")

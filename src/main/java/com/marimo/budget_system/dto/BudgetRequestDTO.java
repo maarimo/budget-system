@@ -5,6 +5,7 @@ import java.util.List;
 
 public record BudgetRequestDTO(
         Long customerId,
+        String serviceDescription,
         BigDecimal laborCost,
         List<BudgetItemRequestDTO> items
 ) {}

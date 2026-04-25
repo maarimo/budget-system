@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerar Orçamento</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+        }
+
+        .menu {
+            margin-bottom: 20px;
+        }
+
+        .item button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="menu">
+        <button onclick="goMenu()">Menu</button>
+        <button onclick="goToCustomers()">Clientes</button>
+        <button onclick="goToBudgets()">Ver Orçamentos</button>
+    </div>
+
+    <h2>Gerar Orçamento</h2>
+
+    <label>Cliente</label>
+    <select id="customer"></select>
+
+    <h3>Serviço</h3>
+
+    <label>Descrição do Serviço</label>
+    <input id="serviceDescription" placeholder="Ex: Confecção de terno sob medida">
+
+    <h3>Materiais</h3>
+
+    <div id="items"></div>
+
+    <button onclick="addItem()">Adicionar Material</button>
+
+    <h3>Finalização</h3>
+
+    <label>Mão de Obra</label>
+    <input type="number" id="laborCost">
+
+    <button onclick="submitBudget()">Gerar Orçamento</button>
+
+</div>
+
+<script>
+
+    function loadCustomers() {
+        fetch("http://localhost:8080/customers")
+            .then(res => res.json())
+            .then(data => {
+                const select = document.getElementById("customer");
+
+                select.innerHTML = '<option value="">Selecione um cliente</option>';
+
+                data.forEach(c => {
+                    const option = document.createElement("option");
+                    option.value = c.id;
+                    option.text = c.name;
+                    select.appendChild(option);
+                });
+            })
+            .catch(err => {
+                console.error("Erro ao carregar clientes:", err);
+                alert("Erro ao carregar clientes");
+            });
+    }
+
+    function addItem() {
+
+        const container = document.getElementById("items");
+
+        const div = document.createElement("div");
+        div.className = "item";
+
+        div.innerHTML = `
+            <input placeholder="Material" class="material">
+            <input type="number" placeholder="Quantidade" class="quantity">
+            <input type="number" placeholder="Custo unitário" class="unitCost">
+            <input type="number" placeholder="Margem (%)" class="profitMargin">
+            <button onclick="removeItem(this)">Remover</button>
+        `;
+
+        container.appendChild(div);
+    }
+
+    function removeItem(button) {
+        button.parentElement.remove();
+    }
+
+    function submitBudget() {
+
+        const customerId = document.getElementById("customer").value;
+        const serviceDescription = document.getElementById("serviceDescription").value;
+        const laborCost = document.getElementById("laborCost").value;
+
+        if (!customerId) {
+            alert("Selecione um cliente");
+            return;
+        }
+
+        if (!serviceDescription) {
+            alert("Informe a descrição do serviço");
+            return;
+        }
+
+        const items = [];
+
+        document.querySelectorAll(".item").forEach(item => {
+
+            items.push({
+                material: item.querySelector(".material").value,
+                quantity: parseFloat(item.querySelector(".quantity").value),
+                unitCost: parseFloat(item.querySelector(".unitCost").value),
+                profitMargin: parseFloat(item.querySelector(".profitMargin").value)
+            });
+
+        });
+
+        const body = {
+            customerId: parseInt(customerId),
+            serviceDescription: serviceDescription,
+            laborCost: parseFloat(laborCost),
+            items: items
+        };
+
+        fetch("http://localhost:8080/budgets", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(body)
+        })
+        .then(res => {
+            if (!res.ok) {
+                throw new Error("Erro ao criar orçamento");
+            }
+            return res.json();
+        })
+        .then(() => {
+            alert("Orçamento criado com sucesso!");
+            window.location.href = "budgets.html";
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Erro ao criar orçamento");
+        });
+    }
+
+    function goMenu() {
+        window.location.href = "index.html";
+    }
+
+    function goToCustomers() {
+        window.location.href = "customers.html";
+    }
+
+    function goToBudgets() {
+        window.location.href = "budgets.html";
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadCustomers();
+    });
+
+</script>
+
+</body>
+</html>

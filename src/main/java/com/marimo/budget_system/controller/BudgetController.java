@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/budgets")
 public class BudgetController {
@@ -68,6 +69,7 @@ public class BudgetController {
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
 
         Budget budget = new Budget();
+        budget.setServiceDescription(dto.serviceDescription());
         budget.setCustomer(customer);
         budget.setLaborCost(dto.laborCost());
         budget.setCreatedAt(LocalDateTime.now());
@@ -117,9 +119,21 @@ public class BudgetController {
         }).collect(java.util.stream.Collectors.toList());
 
         budget.getItems().addAll(newItems);
-        
+
         budgetService.updateBudgetValues(budget);
 
         return budgetRepository.save(budget);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteBudget(@PathVariable Long id) {
+
+        if (!budgetRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        budgetRepository.deleteById(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

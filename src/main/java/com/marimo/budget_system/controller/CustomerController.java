@@ -48,7 +48,12 @@ public class CustomerController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public void deleteCustomer(@PathVariable Long id) {
+        if (!customerRepository.existsById(id)) {
+            throw new RuntimeException("Cliente não encontrado");
+        }
         customerRepository.deleteById(id);
     }
+
+
 }

@@ -35,9 +35,7 @@ public class PdfService {
                 Image logo = new Image(ImageDataFactory.create("src/main/resources/logo.png"))
                         .scaleToFit(120, 60);
                 document.add(logo);
-            } catch (Exception ignored) {
-                // se não tiver logo, segue sem erro
-            }
+            } catch (Exception ignored) {}
 
             // Título
             document.add(new Paragraph("ORÇAMENTO")
@@ -47,9 +45,26 @@ public class PdfService {
 
             document.add(new Paragraph("\n"));
 
-            // Cliente + Data
-            document.add(new Paragraph("Cliente: " + budget.getCustomer().getName()));
-            document.add(new Paragraph("Data: " + budget.getCreatedAt().format(formatter)));
+            // Cliente
+            String customerName = budget.getCustomer() != null
+                    ? budget.getCustomer().getName()
+                    : "N/A";
+
+            document.add(new Paragraph("Cliente: " + customerName));
+
+            // Data
+            String date = budget.getCreatedAt() != null
+                    ? budget.getCreatedAt().format(formatter)
+                    : "N/A";
+
+            document.add(new Paragraph("Data: " + date));
+
+            // Serviço
+            String service = budget.getServiceDescription() != null
+                    ? budget.getServiceDescription()
+                    : "N/A";
+
+            document.add(new Paragraph("Serviço: " + service));
 
             document.add(new Paragraph("\n"));
 
@@ -57,16 +72,19 @@ public class PdfService {
             float[] columnWidths = {200F, 80F, 100F, 100F};
             Table table = new Table(columnWidths);
 
-            table.addHeaderCell("Descrição");
+            table.addHeaderCell("Material");
             table.addHeaderCell("Qtd");
             table.addHeaderCell("Unitário");
             table.addHeaderCell("Total");
 
-            for (BudgetItem item : budget.getItems()) {
-                table.addCell(item.getDescription());
-                table.addCell(String.valueOf(item.getQuantity()));
-                table.addCell(currency.format(item.getUnitCost()));
-                table.addCell(currency.format(item.getTotalAmount()));
+            if (budget.getItems() != null) {
+                for (BudgetItem item : budget.getItems()) {
+
+                    table.addCell(item.getMaterial() != null ? item.getMaterial() : "-");
+                    table.addCell(String.valueOf(item.getQuantity()));
+                    table.addCell(currency.format(item.getUnitCost()));
+                    table.addCell(currency.format(item.getTotalAmount()));
+                }
             }
 
             document.add(table);
@@ -74,10 +92,12 @@ public class PdfService {
             document.add(new Paragraph("\n"));
 
             // Mão de obra
-            document.add(new Paragraph("Mão de obra: " + currency.format(budget.getLaborCost())));
+            document.add(new Paragraph("Mão de obra: " +
+                    currency.format(budget.getLaborCost())));
 
             // TOTAL
-            document.add(new Paragraph("TOTAL: " + currency.format(budget.getTotalAmount()))
+            document.add(new Paragraph("TOTAL: " +
+                    currency.format(budget.getTotalAmount()))
                     .setBold()
                     .setFontSize(14)
                     .setTextAlignment(TextAlignment.RIGHT));

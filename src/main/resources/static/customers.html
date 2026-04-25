@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Clientes</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px;
+            margin-top: 5px;
+            cursor: pointer;
+        }
+
+        .client {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="menu">
+        <button onclick="goMenu()">Menu</button>
+        <button onclick="goToBudgets()">Ver Orçamentos</button>
+        <button onclick="goToCreateBudget()">Gerar Orçamento</button>
+    </div>
+
+    <h2>Gerenciar Clientes</h2>
+
+    <h3>Cadastrar Cliente</h3>
+
+    <input id="name" placeholder="Nome">
+    <input id="email" placeholder="Email">
+    <input id="phone" placeholder="Telefone">
+
+    <button onclick="createCustomer()">Salvar Cliente</button>
+
+    <h3>Lista de Clientes</h3>
+
+    <div id="customers"></div>
+
+</div>
+
+<script>
+
+    function loadCustomers() {
+        fetch("http://localhost:8080/customers")
+            .then(res => res.json())
+            .then(data => {
+
+                const container = document.getElementById("customers");
+                container.innerHTML = "";
+
+                data.forEach(c => {
+
+                    const div = document.createElement("div");
+                    div.className = "client";
+
+                    div.innerHTML = `
+                        <div>
+                            <strong>${c.name}</strong><br>
+                            ${c.email || ""}<br>
+                            ${c.phone || ""}
+                        </div>
+
+                        <div>
+                            <button onclick="deleteCustomer(${c.id})">Deletar</button>
+                        </div>
+                    `;
+
+                    container.appendChild(div);
+                });
+
+            })
+            .catch(err => {
+                console.error("Erro ao carregar clientes:", err);
+                alert("Erro ao carregar clientes");
+            });
+    }
+
+    function createCustomer() {
+
+        const body = {
+            name: document.getElementById("name").value,
+            email: document.getElementById("email").value,
+            phone: document.getElementById("phone").value
+        };
+
+        fetch("http://localhost:8080/customers", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(body)
+        })
+        .then(res => {
+            if (!res.ok) {
+                throw new Error("Erro ao criar cliente");
+            }
+            return res.json();
+        })
+        .then(() => {
+            alert("Cliente criado!");
+            document.getElementById("name").value = "";
+            document.getElementById("email").value = "";
+            document.getElementById("phone").value = "";
+            loadCustomers();
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Erro ao criar cliente");
+        });
+    }
+
+    function deleteCustomer(id) {
+
+        if (!confirm("Tem certeza que deseja deletar este cliente?")) {
+            return;
+        }
+
+        fetch(`http://localhost:8080/customers/${id}`, {
+            method: "DELETE"
+        })
+        .then(res => {
+            if (!res.ok) {
+                throw new Error("Não foi possível deletar");
+            }
+            return res.text();
+        })
+        .then(() => {
+            alert("Cliente deletado!");
+            loadCustomers();
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Não foi possível deletar. Esse cliente pode ter orçamentos vinculados.");
+        });
+    }
+
+    function goMenu() {
+        window.location.href = "index.html";
+    }
+
+    function goToBudgets() {
+        window.location.href = "budgets.html";
+    }
+
+    function goToCreateBudget() {
+        window.location.href = "create-budget.html";
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadCustomers();
+    });
+
+</script>
+
+</body>
+</html>

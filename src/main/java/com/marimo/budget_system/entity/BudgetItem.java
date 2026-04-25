@@ -1,5 +1,6 @@
 package com.marimo.budget_system.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,6 +26,7 @@ public class BudgetItem {
 
     @ManyToOne
     @JoinColumn(name = "budget_id")
+    @JsonIgnore
     private Budget budget;
 
 }

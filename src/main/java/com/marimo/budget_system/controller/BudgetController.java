@@ -36,6 +36,17 @@ public class BudgetController {
         this.customerRepository = customerRepository;
     }
 
+    @GetMapping
+    public List<Budget> findAll() {
+        return budgetRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+    @GetMapping("/{id}")
+    public Budget findById(@PathVariable Long id) {
+        return budgetRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Budget not found"));
+    }
+
     @GetMapping("/{id}/pdf")
     public ResponseEntity<byte[]> generatePdf(@PathVariable Long id) {
 
@@ -75,6 +86,38 @@ public class BudgetController {
 
         budget.setItems(items);
 
+        budgetService.updateBudgetValues(budget);
+
+        return budgetRepository.save(budget);
+    }
+
+    @PutMapping("/{id}")
+    public Budget updateBudget(@PathVariable Long id, @RequestBody BudgetRequestDTO dto) {
+
+        Budget budget = budgetRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Budget not found"));
+
+        Customer customer = customerRepository.findById(dto.customerId())
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        budget.setCustomer(customer);
+        budget.setLaborCost(dto.laborCost());
+
+        budget.getItems().clear();
+
+        List<BudgetItem> newItems = dto.items().stream().map(itemDto -> {
+            BudgetItem item = new BudgetItem();
+            item.setDescription(itemDto.description());
+            item.setMaterial(itemDto.material());
+            item.setQuantity(itemDto.quantity());
+            item.setUnitCost(itemDto.unitCost());
+            item.setProfitMargin(itemDto.profitMargin());
+            item.setBudget(budget);
+            return item;
+        }).collect(java.util.stream.Collectors.toList());
+
+        budget.getItems().addAll(newItems);
+        
         budgetService.updateBudgetValues(budget);
 
         return budgetRepository.save(budget);

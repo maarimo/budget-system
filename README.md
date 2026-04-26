@@ -82,8 +82,8 @@ mvn spring-boot:run
 
 ### Banco de dados
 
-# Configure no application.yaml:
-
+- Configure no application.yaml:
+````
 spring:
   application:
     name: budget-system
@@ -100,14 +100,16 @@ spring:
     properties:
       hibernate:
         format_sql: true
+````
 
 ### Frontend
 
-#Abra o arquivo:
+# Abra o arquivo:
 resources/static/index.html
 
 ### Estrutura do projeto
 
+````
 budget-system
 │
 ├── backend
@@ -122,7 +124,7 @@ budget-system
 │   ├── customers.html
 │   ├── create-budget.html
 │   ├── budgets.html
-
+````
 ### Prints
 
 <img width="720" height="628" alt="image" src="https://github.com/user-attachments/assets/c2d587c8-0d9d-42ea-af88-a74422aabd57" />
@@ -131,24 +133,22 @@ budget-system
 
 <img width="1237" height="429" alt="image" src="https://github.com/user-attachments/assets/199f137e-3c69-40a2-b8d6-0d2d86a4670a" />
 
-<img width="1237" height="429" alt="image" src="https://github.com/user-attachments/assets/0650e6b3-4420-4fba-8d39-8af8558e7e39" />
-
 <img width="1281" height="968" alt="image" src="https://github.com/user-attachments/assets/8e2ac2bd-9c43-4e6a-8c6e-4146f04593b6" />
 
 <img width="988" height="943" alt="image" src="https://github.com/user-attachments/assets/29fdbd74-462e-447a-a2d3-a24be10a8446" />
 
 ### Melhorias futuras
 
-Autenticação de usuários
-Deploy na nuvem
+- Autenticação de usuários
+- Deploy na nuvem
 
 ### Aprendizados
 
-# Durante o desenvolvimento deste projeto, foram trabalhados conceitos como:
+Durante o desenvolvimento deste projeto, foram trabalhados conceitos como:
 
-Modelagem de dados
-Relacionamentos JPA
-Integração frontend e backend
-Manipulação de arquivos (PDF)
-Organização de projeto
+- Modelagem de dados
+- Relacionamentos JPA
+- Integração frontend e backend
+- Manipulação de arquivos (PDF)
+- Organização de projeto
 --- 

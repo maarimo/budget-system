@@ -1,4 +1,4 @@
-# 💰 Budget System - Sistema de Orçamentos
+# Budget System - Sistema de Orçamentos
 
 Sistema web para criação e gerenciamento de orçamentos profissionais, com geração de PDF.
 
@@ -38,18 +38,18 @@ O Budget System é uma aplicação fullstack desenvolvida com foco em prática r
 
 ## Funcionalidades
 
-### 👤 Clientes
+### Clientes
 - Criar cliente
 - Listar clientes
 - Deletar cliente
 
-### 📄 Orçamentos
+### Orçamentos
 - Criar orçamento
 - Listar orçamentos
 - Deletar orçamento
 - Calcular total automaticamente
 
-### 🧾 PDF
+### PDF
 - Gerar orçamento em PDF
 - Layout profissional
 - Tabela de materiais
@@ -57,9 +57,9 @@ O Budget System é uma aplicação fullstack desenvolvida com foco em prática r
 
 ---
 
-## 🖥️ Como rodar o projeto
+## Como rodar o projeto
 
-### 🔧 Pré-requisitos
+### Pré-requisitos
 
 - Java 21
 - Maven
@@ -67,7 +67,7 @@ O Budget System é uma aplicação fullstack desenvolvida com foco em prática r
 
 ---
 
-### 📦 Backend
+### Backend
 
 ```bash
 # clonar o projeto

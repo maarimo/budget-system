@@ -102,11 +102,6 @@ spring:
         format_sql: true
 ````
 
-### Frontend
-
-# Abra o arquivo:
-resources/static/index.html
-
 ### Estrutura do projeto
 
 ````

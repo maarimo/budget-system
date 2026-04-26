@@ -91,7 +91,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/budget_db
     username: postgres
-    password: root
+    password: sua_senha
 
   jpa:
     hibernate:
